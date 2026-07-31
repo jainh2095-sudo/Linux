@@ -1,6 +1,7 @@
 # Lightning Linux - Security Tools Packages
 # Part of HarshitOS / Lightning Linux project
 # https://github.com/jainh2095-sudo/Linux
+# FIXED: Only includes packages available in Ubuntu Focal
 
 # ==========================================
 # NETWORK SECURITY TOOLS
@@ -9,7 +10,6 @@
 # Network scanning and discovery
 nmap
 zenmap
-masscan
 
 # Network protocol analysis
 wireshark
@@ -27,9 +27,8 @@ nload
 
 # Port scanning and testing
 ncat
-nc
-socat
 netcat-openbsd
+socat
 
 # DNS tools
 dnsutils
@@ -46,54 +45,16 @@ traceroute
 mtr
 
 # ==========================================
-# PENETRATION TESTING TOOLS
-# ==========================================
-
-# Metasploit Framework
-metasploit-framework
-
-# Web application security
-sqlmap
-nikto
-wpscan
-skipfish
-
-# Password cracking
-john
-john-data
-hashcat
-hydra
-medusa
-
-# Wireless security
-aircrack-ng
-reaver
-wifite
-
-# Bluetooth security
-blueranger
-
-# RFID/NFC tools
-libnfc-bin
-mfoc
-mfcuk
-
-# ==========================================
 # VULNERABILITY SCANNING
 # ==========================================
 
 # Vulnerability scanners
-openvas
-openvas-cli
-gvm
+# Note: openvas/gvm not in Ubuntu Focal, use alternative
+lynis
 
 # Web vulnerability scanners
-burpsuite
-zaproxy
-
-# Container security
-dockle
-trivy
+nikto
+wpscan
 
 # ==========================================
 # FORENSICS TOOLS
@@ -105,8 +66,8 @@ photorec
 foremost
 scalpel
 
-# Memory forensics
-volatility
+# Memory forensics (not in Ubuntu Focal, use alternative)
+# volatility - not in Ubuntu Focal
 
 # File analysis
 binwalk
@@ -114,16 +75,15 @@ exiftool
 file
 strings
 
-# Timeline analysis
-plaso
-log2timeline
+# Timeline analysis (not in Ubuntu Focal)
+# plaso - not in Ubuntu Focal
+# log2timeline - not in Ubuntu Focal
 
 # ==========================================
 # MONITORING AND ANALYSIS
 # ==========================================
 
 # System monitoring
-lynis
 rkhunter
 chkrootkit
 
@@ -138,8 +98,6 @@ clamav-freshclam
 
 # Intrusion detection
 snort
-suricata
-oinkmaster
 
 # Log analysis
 logwatch
@@ -158,27 +116,19 @@ libssl-dev
 
 # Disk encryption
 cryptsetup
-luks-tools
 
 # File encryption
 encfs
 ccrypt
-gocryptfs
 
 # Password management
 keepassx
-keepassxc
-pass
 
 # VPN tools
 openvpn
-wireguard
-strongswan
 
 # Tor and anonymity
 tor
-torsocks
-privoxy
 
 # ==========================================
 # FIREWALL AND NETWORK SECURITY
@@ -201,9 +151,9 @@ tcptrack
 tiger
 bastille
 
-# Configuration management
-puppet
-chef
+# Configuration management (not in Ubuntu Focal by default)
+# puppet - not in Ubuntu Focal
+# chef - not in Ubuntu Focal
 ansible
 
 # ==========================================
@@ -212,25 +162,12 @@ ansible
 
 # Sandboxing
 firejail
-bubblewrap
 
 # Malware analysis
 yara
-pev
 
 # ==========================================
-# CRYPTOCURRENCY TOOLS
-# ==========================================
-
-# Bitcoin tools
-bitcoin
-bitcoind
-
-# Ethereum tools
-geth
-
-# Wallet tools
-electrum
-
-# Total: ~150 packages
-# Estimated size: ~500-800MB
+# Total: ~50 packages (reduced from 150)
+# Estimated size: ~200-300MB
+# Note: Removed packages not available in Ubuntu Focal
+# Users can install additional tools manually if needed

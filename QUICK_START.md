@@ -14,34 +14,226 @@
 ✅ **Office Applications** (LibreOffice, Firefox, Thunderbird)
 ✅ **Performance Optimizations** (ZRAM, ZSWAP, THP, BFQ I/O)
 ✅ **2GB RAM Optimized** (Idle: ~500MB, Full Load: ~2GB)
+✅ **EFI Boot Support** (FIXED)
+✅ **Error Handling** (FIXED)
+✅ **Timeout Protection** (FIXED)
 
 ---
 
-## 🚀 Get Started in 3 Steps
+## 🚀 **CHOOSING YOUR BUILD METHOD**
 
-### Step 1: Build the ISO
+### For Linux/macOS Users
+Use the **native build method** - fastest and easiest!
 
+### For Windows Users
+You have **3 options**:
+
+| Method | Difficulty | Speed | Recommended |
+|--------|------------|-------|-------------|
+| **WSL2** | ⭐ Easy | ⚡ Fast | ✅ **YES** |
+| **VirtualBox** | ⭐⭐ Medium | 🐢 Slow | ⚠️ Good |
+| **Docker** | ⭐⭐⭐ Hard | ⚡ Fast | ❌ Advanced |
+
+**Recommendation: Use WSL2!** It's the easiest and fastest for Windows users.
+
+---
+
+## 🪟 **METHOD 1: Linux/macOS (Native - Recommended)**
+
+### Step 1: Install Dependencies
 ```bash
-# Make script executable
+# Ubuntu/Debian
+sudo apt update
+sudo apt install -y git debootstrap squashfs-tools xorriso grub2 grub-efi-amd64-bin syslinux
+
+# Fedora
+sudo dnf install -y git debootstrap squashfs-tools xorriso grub2 grub2-efi-x64 syslinux
+
+# Arch Linux
+sudo pacman -Syu --noconfirm git squashfs-tools xorriso grub syslinux
+```
+
+### Step 2: Clone and Build
+```bash
+# Clone the repository
+git clone https://github.com/jainh2095-sudo/Linux.git
+cd Linux
+
+# Make executable
 chmod +x BUILD_NOW.sh
 
 # Run the build (as root)
 sudo ./BUILD_NOW.sh
 ```
 
-**This will:**
-- Download and install Ubuntu Focal base system
-- Install Xfce4 desktop environment
-- Install all security, development, media, and office tools
-- Configure performance optimizations
-- Create a bootable ISO image
+**Build Time:** ~15-30 minutes  
+**ISO Size:** ~2-3GB  
+**Required Space:** 15GB+ free disk space
 
-**Build Time:** ~15-30 minutes (depending on internet speed)
-**ISO Size:** ~2-3GB
-**Required Space:** 10GB+ free disk space
+---
 
-### Step 2: Create Bootable USB
+## 🪟 **METHOD 2: Windows (WSL2 - Recommended)**
 
+### Step 1: Install WSL2
+
+**Open PowerShell as Administrator and run:**
+```powershell
+# Install WSL2
+wsl --install
+
+# Set WSL2 as default
+wsl --set-default-version 2
+
+# Restart your computer
+Restart-Computer
+```
+
+### Step 2: Install Ubuntu from Microsoft Store
+1. Open **Microsoft Store**
+2. Search for **"Ubuntu 22.04 LTS"**
+3. Click **Install**
+4. Wait for installation to complete
+
+### Step 3: Launch Ubuntu and Set Up
+```powershell
+# Launch Ubuntu (this will open a terminal)
+ubuntu2204
+```
+
+**Inside the Ubuntu terminal, run:**
+```bash
+# Update system
+sudo apt update && sudo apt upgrade -y
+
+# Install git
+sudo apt install -y git
+
+# Clone Lightning Linux
+git clone https://github.com/jainh2095-sudo/Linux.git
+cd Linux
+```
+
+### Step 4: Build Lightning Linux
+```bash
+# Make executable
+chmod +x BUILD_NOW.sh
+
+# Run the build
+sudo ./BUILD_NOW.sh
+```
+
+**Build Time:** ~15-30 minutes
+
+### Step 5: Copy ISO to Windows
+```bash
+# Copy to Windows Downloads folder
+cp build/output/lightning-linux-1.0-amd64.iso /mnt/c/Users/$USER/Downloads/
+```
+
+### Step 6: Create Bootable USB (Windows)
+1. **Download Rufus:** https://rufus.ie/
+2. **Open Rufus**
+3. **Select your USB drive** (WARNING: This will ERASE all data!)
+4. **Select the ISO file** from Downloads
+5. **Click START**
+6. **Wait for completion** (~5 minutes)
+
+---
+
+## 🪟 **METHOD 3: Windows (VirtualBox - GUI Method)**
+
+### Step 1: Install VirtualBox
+**Download from:** https://www.virtualbox.org/
+
+### Step 2: Create Ubuntu VM
+1. Open **VirtualBox**
+2. Click **New**
+3. **Name:** `Lightning Linux Builder`
+4. **Type:** `Linux`
+5. **Version:** `Ubuntu (64-bit)`
+6. **RAM:** `4096 MB` (4GB minimum)
+7. **CPU:** `2 processors`
+8. **Hard Disk:** `50 GB` (VDI, Dynamically allocated)
+9. Click **Create**
+
+### Step 3: Install Ubuntu
+1. **Download Ubuntu 22.04 LTS ISO:** https://ubuntu.com/download/desktop
+2. **Start the VM**
+3. **Select the ISO file** when prompted
+4. **Install Ubuntu** (use default settings)
+5. **After install, log in**
+
+### Step 4: Build Lightning Linux
+```bash
+# Update system
+sudo apt update && sudo apt upgrade -y
+
+# Install git
+sudo apt install -y git
+
+# Clone Lightning Linux
+git clone https://github.com/jainh2095-sudo/Linux.git
+cd Linux
+
+# Make executable
+chmod +x BUILD_NOW.sh
+
+# Run the build
+sudo ./BUILD_NOW.sh
+```
+
+### Step 5: Create Bootable USB
+**Option A: From VirtualBox VM**
+```bash
+# In the VM
+sudo ./build/output/create-usb.sh /dev/sdb
+```
+
+**Option B: From Windows**
+1. **Copy ISO to Windows** (use VirtualBox shared folders)
+2. **Use Rufus** (as described in Method 2)
+
+---
+
+## 🪟 **METHOD 4: Windows (Docker - Advanced)**
+
+### Step 1: Install Docker Desktop
+**Download from:** https://www.docker.com/products/docker-desktop/
+
+### Step 2: Create Dockerfile
+```powershell
+# Create Dockerfile
+cat > Dockerfile <<'EOF'
+FROM ubuntu:22.04
+
+RUN apt update && apt upgrade -y && \
+    apt install -y git debootstrap squashfs-tools xorriso grub2 grub-efi-amd64-bin syslinux
+
+WORKDIR /workspace
+RUN git clone https://github.com/jainh2095-sudo/Linux.git
+WORKDIR /workspace/Linux
+
+CMD ["/bin/bash", "-c", "chmod +x BUILD_NOW.sh && sudo ./BUILD_NOW.sh"]
+EOF
+```
+
+### Step 3: Build and Run
+```powershell
+# Build Docker image
+docker build -t lightning-builder .
+
+# Run container with volume mount
+docker run -it --rm -v C:\output:C:\output lightning-builder
+```
+
+### Step 4: Get the ISO
+The ISO will be in `C:\output\` on your Windows machine
+
+---
+
+## 💻 **AFTER BUILDING: CREATE BOOTABLE USB**
+
+### For Linux/macOS:
 ```bash
 # List your USB devices
 lsblk
@@ -49,347 +241,218 @@ lsblk
 # Find your USB device (e.g., /dev/sdb)
 # WARNING: This will ERASE all data on the USB!
 
-# Create bootable USB (replace /dev/sdX with your USB device)
+# Create bootable USB
 sudo ./build/output/create-usb.sh /dev/sdX
 ```
 
-**Alternative Methods:**
-- **Windows:** Use Rufus or Balena Etcher
-- **macOS:** Use Balena Etcher or `dd` command
+### For Windows:
+1. **Use Rufus** (Recommended): https://rufus.ie/
+   - Select USB drive
+   - Select ISO file
+   - Click START
 
-### Step 3: Boot and Use!
+2. **Use Balena Etcher:** https://www.balena.io/etcher/
+   - Select ISO
+   - Select USB drive
+   - Click Flash
 
-1. **Insert USB** into your computer
-2. **Enter BIOS/UEFI** (usually by pressing F2, F12, DEL, or ESC during boot)
-3. **Select USB** as boot device
-4. **Save and exit**
-5. **Lightning Linux** will boot automatically!
+3. **Use Command Line (PowerShell):**
+   ```powershell
+   # Find your USB device number
+   Get-PnpDevice | Where-Object {$_.Class -eq "DiskDrive"}
+   
+   # Write ISO (REPLACES X with your device number!)
+   dd if=lightning-linux-1.0-amd64.iso of=\.\PHYSICALDRIVE1 bs=4M status=progress
+   ```
 
 ---
 
-## 💻 Login Credentials
+## 💻 **LOGIN CREDENTIALS**
 
 | Account | Username | Password |
 |---------|----------|----------|
-| User | `lightning` | `lightning` |
-| Root | `root` | `lightning` |
+| **User** | `lightning` | `lightning` |
+| **Root** | `root` | `lightning` |
 
-**Note:** The user `lightning` has sudo privileges (no password required).
+**The user `lightning` has sudo privileges (no password needed for sudo)!**
 
 ---
 
-## 🎨 What's Included
+## 📦 **WHAT'S INCLUDED**
 
-### Desktop Environment
-- **Xfce4** - Lightweight desktop environment
-- **LightDM** - Login manager
-- **Picom** - Compositing manager
-- **Thunar** - File manager
-- **Mousepad** - Text editor
-- **Ristretto** - Image viewer
-- **Galculator** - Calculator
+### Desktop & UI
+- ✅ Xfce4 Desktop Environment
+- ✅ LightDM Login Manager
+- ✅ Picom Compositing
+- ✅ Thunar File Manager
+- ✅ Mousepad Text Editor
+- ✅ Ristretto Image Viewer
 
-### Security Tools
-- **nmap** - Network mapper
-- **wireshark** - Network protocol analyzer
-- **tcpdump** - Network packet analyzer
-- **tshark** - Command-line network analyzer
-- **ncat** - Network connection tool
-- **ufw** - Firewall
-- **apparmor** - Mandatory access control
-- **rkhunter** - Rootkit hunter
-- **chkrootkit** - Rootkit detection
-- **lynis** - Security auditing
-- **clamav** - Antivirus
+### Security Tools (Kali-like)
+- ✅ nmap
+- ✅ wireshark
+- ✅ tcpdump
+- ✅ tshark
+- ✅ ncat
+- ✅ ufw (Firewall)
+- ✅ apparmor
+- ✅ rkhunter
+- ✅ chkrootkit
+- ✅ lynis
+- ✅ clamav
 
 ### Development Tools
-- **gcc/g++** - C/C++ compiler
-- **make** - Build tool
-- **cmake** - Cross-platform build system
-- **git** - Version control
-- **subversion** - Version control
-- **python3** - Python interpreter
-- **nodejs** - JavaScript runtime
-- **npm** - Node package manager
-- **default-jdk** - Java development kit
-- **golang** - Go programming language
-- **flatpak** - Sandboxed application packaging
+- ✅ gcc/g++
+- ✅ make
+- ✅ cmake
+- ✅ git
+- ✅ subversion
+- ✅ python3
+- ✅ nodejs
+- ✅ npm
+- ✅ default-jdk
+- ✅ golang
+- ✅ flatpak
 
 ### Media Applications
-- **VLC** - Media player
-- **MPV** - Media player
-- **Audacious** - Audio player
-- **GIMP** - Image editor
-- **feh** - Image viewer
-- **scrot** - Screenshot tool
-- **SimpleScreenRecorder** - Screen recorder
-- **FFmpeg** - Multimedia framework
+- ✅ VLC
+- ✅ MPV
+- ✅ Audacious
+- ✅ GIMP
+- ✅ feh
+- ✅ scrot
+- ✅ SimpleScreenRecorder
+- ✅ FFmpeg
 
 ### Office Applications
-- **LibreOffice** - Office suite
-- **Firefox** - Web browser
-- **Thunderbird** - Email client
+- ✅ LibreOffice
+- ✅ Firefox
+- ✅ Thunderbird
 
 ### System Tools
-- **htop** - Process viewer
-- **iotop** - I/O monitor
-- **iftop** - Network bandwidth monitor
-- **nmon** - System monitoring
-- **glances** - Comprehensive monitoring
-- **lsof** - List open files
+- ✅ htop
+- ✅ iotop
+- ✅ iftop
+- ✅ nmon
+- ✅ glances
+- ✅ lsof
+
+### Performance Optimizations
+- ✅ **ZRAM** (50% of RAM for compressed swap)
+- ✅ **ZSWAP** (lz4 compression)
+- ✅ **THP** (Transparent HugePages)
+- ✅ **BFQ I/O Scheduler** (Better disk performance)
+- ✅ **schedutil CPU Governor** (Modern CPU management)
 
 ---
 
-## ⚡ Performance Optimizations
+## 📊 **SYSTEM SPECIFICATIONS**
 
-Lightning Linux includes these optimizations out of the box:
+### Performance Targets
+- **RAM Usage (Idle):** ~500MB
+- **RAM Usage (Full Load):** ~2GB
+- **Storage (ISO):** ~2-3GB
+- **Boot Time:** <10 seconds
 
-### Memory Optimizations
-- **ZRAM**: 50% of RAM used for compressed swap
-- **ZSWAP**: lz4 compression for swap space
-- **Swappiness**: Set to 60 for balanced performance
+### Hardware Requirements
+| Component | Minimum | Recommended | Optimal |
+|-----------|---------|-------------|---------|
+| CPU | 1 GHz (64-bit) | 2 GHz dual-core | 4+ cores |
+| RAM | 1GB | 2GB | 4GB+ |
+| Storage | 4GB | 10GB | 20GB+ |
 
-### CPU Optimizations
-- **CPU Governor**: schedutil (modern, efficient)
-- **Minimum Frequency**: 800MHz
-- **Maximum Frequency**: 3.6GHz
-
-### I/O Optimizations
-- **I/O Scheduler**: BFQ (Budget Fair Queuing)
-- **Read-ahead**: Optimized for performance
-
-### Filesystem Optimizations
-- **Noatime**: Disabled access time updates
-- **Nodiratime**: Disabled directory access time updates
+### Target Hardware
+- **Primary:** i5 6th Gen + 4GB RAM (PERFECTLY OPTIMIZED)
+- **Great:** i3-4000M, i5-4200M, i7-6500U
+- **Good:** Any x86_64 CPU + 2GB RAM
 
 ---
 
-## 🖥️ Test Without USB
+## 🔥 **QUICK TEST (No USB Needed!)**
 
-### Test in QEMU
-
+### Test in QEMU (Linux/macOS)
 ```bash
-# Install QEMU if not already installed
-sudo apt install qemu-system-x86
+# Install QEMU if needed
+sudo apt install qemu-system-x86  # Ubuntu/Debian
+sudo dnf install qemu-system-x86  # Fedora
 
-# Run the test script
+# Run the test
 ./build/output/test-qemu.sh
 ```
 
 **QEMU Controls:**
 - `Ctrl+Alt+G` - Release mouse cursor
-- `Ctrl+C` - Shutdown VM
+- Username: `lightning`
+- Password: `lightning`
 
-### Test in VirtualBox
-
-1. **Open VirtualBox**
-2. **Create New VM**
+### Test in VirtualBox (All Platforms)
+1. Open VirtualBox
+2. Create New VM
    - Name: Lightning Linux
    - Type: Linux
    - Version: Ubuntu (64-bit)
-3. **Memory**: 2048MB (2GB)
-4. **CPU**: 2 processors
-5. **Storage**: Create 20GB virtual disk
-6. **Attach ISO**: Select the built ISO file
-7. **Start VM**
+3. Memory: 2048MB
+4. CPU: 2 processors
+5. Storage: Create 20GB disk
+6. Attach ISO: `build/output/lightning-linux-1.0-amd64.iso`
+7. Start VM
 
 ---
 
-## 📊 System Requirements
+## 🛠️ **TROUBLESHOOTING**
 
-### Minimum
-- **CPU**: 1 GHz (64-bit)
-- **RAM**: 1GB
-- **Storage**: 4GB
-- **Graphics**: Any VGA-compatible
+### Common Issues
 
-### Recommended
-- **CPU**: 2 GHz dual-core (64-bit)
-- **RAM**: 2GB
-- **Storage**: 10GB
-- **Graphics**: Intel HD Graphics / AMD Radeon / NVIDIA
-
-### Optimal (for best experience)
-- **CPU**: 4+ cores
-- **RAM**: 4GB+
-- **Storage**: 20GB+
-- **Graphics**: Dedicated GPU
-
----
-
-## 🎯 Target Hardware
-
-Lightning Linux is **optimized for i5 6th generation + 4GB RAM**, but works on:
-
-### Officially Supported
-| Hardware | Status | Notes |
-|----------|--------|-------|
-| i5-6200U + 4GB RAM | ✅ **Perfect** | Primary target |
-| i5-6300HQ + 4GB RAM | ✅ **Perfect** | Primary target |
-| i3-4000M + 4GB RAM | ✅ **Great** | Good performance |
-| i7-6500U + 8GB RAM | ✅ **Excellent** | Extra performance |
-| Any x86_64 CPU + 2GB RAM | ✅ **Good** | Basic functionality |
-
-### Virtualization
-| Platform | Status | Notes |
-|----------|--------|-------|
-| VirtualBox | ✅ **Fully Supported** | Guest Additions included |
-| VMware | ✅ **Fully Supported** | VMware Tools included |
-| QEMU/KVM | ✅ **Fully Supported** | VirtIO drivers included |
-| Hyper-V | ✅ **Supported** | Integration Services included |
-
----
-
-## 🔧 Customization
-
-### Change Default Password
-
-After booting, change the password:
-
-```bash
-# Change user password
-passwd lightning
-
-# Change root password
-sudo passwd root
-```
-
-### Install Additional Software
-
-```bash
-# Update package lists
-sudo apt update
-
-# Install new packages
-sudo apt install package-name
-
-# Remove packages
-sudo apt remove package-name
-
-# Clean up
-sudo apt autoremove
-sudo apt clean
-```
-
-### Enable/Disable Services
-
-```bash
-# List all services
-systemctl list-unit-files --type=service
-
-# Enable a service
-sudo systemctl enable service-name
-sudo systemctl start service-name
-
-# Disable a service
-sudo systemctl disable service-name
-sudo systemctl stop service-name
-
-# Check service status
-sudo systemctl status service-name
-```
-
-### Configure Network
-
-```bash
-# WiFi
-nmcli dev wifi list
-nmcli dev wifi connect "SSID" password "password"
-
-# Ethernet
-nmcli dev show
-
-# Check connection
-ping google.com
-ip a
-```
-
----
-
-## 🛠️ Troubleshooting
-
-### Black Screen on Boot
-
-**Cause:** Graphics driver issue
-
-**Solution:**
-1. At GRUB menu, press `e`
-2. Find the line starting with `linux`
-3. Add `nomodeset` at the end
-4. Press `Ctrl+X` or `F10` to boot
-
-### No WiFi
-
+#### Build Fails with "debootstrap failed"
+**Cause:** Network issues or mirror down  
 **Solution:**
 ```bash
-# Check if WiFi is blocked
-rfkill list
-
-# Unblock WiFi
-rfkill unblock wifi
-
-# Check WiFi interface
-ip a | grep wlan
-
-# Restart Network Manager
-sudo systemctl restart NetworkManager
+# Try a different mirror
+sudo ./BUILD_NOW.sh
+# Or manually specify mirror:
+UBUNTU_VERSION=focal MIRROR=http://mirror.example.com/ubuntu sudo ./BUILD_NOW.sh
 ```
 
-### No Sound
+#### Not Enough Disk Space
+**Cause:** Build requires 15-20GB  
+**Solution:**
+- Free up disk space
+- Build on a different drive
+- Use a larger partition
 
+#### Permission Denied
+**Cause:** Not running as root  
 **Solution:**
 ```bash
-# Check sound devices
-aplay -l
-
-# Check volume
-alsamixer
-
-# Restart PulseAudio
-pulseaudio -k && pulseaudio --start
+sudo ./BUILD_NOW.sh
 ```
 
-### Slow Performance
-
+#### ISO Not Booting on UEFI
+**Cause:** EFI support issue  
 **Solution:**
-```bash
-# Check memory usage
-free -h
+- Try legacy BIOS boot
+- Check if Secure Boot is disabled
+- Use a different USB creation tool
 
-# Check CPU usage
-top
-
-# Check running services
-systemctl list-units --type=service --state=running
-
-# Disable unnecessary services
-sudo systemctl disable service-name
-```
-
-### Can't Login
-
+#### Slow Build
+**Cause:** Network speed or disk I/O  
 **Solution:**
-1. At login screen, select "LightDM GTK Greeter Settings"
-2. Or try logging in with:
-   - Username: `lightning`
-   - Password: `lightning`
-3. If still not working, try:
-   - Username: `root`
-   - Password: `lightning`
+- Use a faster mirror
+- Build on SSD instead of HDD
+- Close other applications
 
 ---
 
-## 📚 Documentation
+## 📚 **DOCUMENTATION**
 
-- **[README.md](README.md)** - Project overview and goals
-- **[BUILD_GUIDE.md](BUILD_GUIDE.md)** - Detailed build instructions
-- **[SYSTEM_ARCHITECTURE.md](docs/architecture/SYSTEM_ARCHITECTURE.md)** - Complete system architecture
-- **[PERFORMANCE_OPTIMIZATIONS.md](docs/architecture/PERFORMANCE_OPTIMIZATIONS.md)** - All optimization strategies
-- **[COMPATIBILITY_GUIDE.md](docs/architecture/COMPATIBILITY_GUIDE.md)** - Hardware/software compatibility
+- **[IMPORTANT.md](IMPORTANT.md)** - Start here! Clear, simple instructions
+- **[BUILD_GUIDE.md](BUILD_GUIDE.md)** - Complete build documentation
+- **[BUGS_AND_ISSUES.md](BUGS_AND_ISSUES.md)** - Known issues and fixes
+- **[README.md](README.md)** - Project overview and architecture
 
 ---
 
-## 🎉 You're Ready!
+## 🎉 **YOU'RE READY!**
 
 That's it! You now have a **production-ready Lightning Linux** distribution that you can:
 
@@ -398,17 +461,17 @@ That's it! You now have a **production-ready Lightning Linux** distribution that
 3. **Test in VirtualBox/QEMU** before installing
 4. **Customize** to your heart's content
 
-**Enjoy your lightweight, fast, and feature-rich Linux distribution!** 🚀
+**Choose your build method and start using Lightning Linux today!** 🚀
 
 ---
 
-## 📞 Support
+## 📞 **SUPPORT**
 
-- **GitHub**: https://github.com/jainh2095-sudo/Linux
-- **Issues**: https://github.com/jainh2095-sudo/Linux/issues
-- **Discussions**: https://github.com/jainh2095-sudo/Linux/discussions
+- **GitHub:** https://github.com/jainh2095-sudo/Linux
+- **Issues:** https://github.com/jainh2095-sudo/Linux/issues
+- **Discussions:** https://github.com/jainh2095-sudo/Linux/discussions
 
 ---
 
-*Built with ❤️ for the Linux community*
-*Lightning Linux - A lightweight, multi-purpose Linux distro*
+*Built with ❤️ for the Linux community*  
+*Lightning Linux - A lightweight, multi-purpose Linux distro combining the best of Ubuntu, Kali, and Mint—optimized for 2GB RAM.*

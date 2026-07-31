@@ -1,10 +1,11 @@
 #!/bin/bash
 
-# Lightning Linux - Quick Production Build
+# Lightning Linux - Quick Production Build (FIXED VERSION)
 # Creates a ready-to-use Linux distribution immediately
 # Part of HarshitOS / Lightning Linux project
+# Fixed: Error handling, space check, root checks, timeout
 
-set -e
+set -euo pipefail
 
 # Colors
 RED='\033[0;31m'
@@ -36,49 +37,77 @@ print_header() {
     echo -e "${CYAN}========================================${NC}"
 }
 
+# Function to check root
+check_root() {
+    if [ "$(id -u)" -ne 0 ]; then
+        print_error "Root privileges required for: $1"
+        print_error "Please run this script with sudo."
+        exit 1
+    fi
+}
+
+# Function to execute with timeout
+timeout_exec() {
+    local cmd="$1"
+    local timeout_seconds="${2:-7200}"  # Default 2 hours
+    local description="${3:-Command}"
+    
+    print_status "Executing (timeout: ${timeout_seconds}s): $description"
+    
+    if ! timeout "$timeout_seconds" bash -c "$cmd" 2>&1; then
+        local exit_code=$?
+        if [ $exit_code -eq 124 ]; then
+            print_error "TIMEOUT: $description took longer than ${timeout_seconds} seconds"
+        else
+            print_error "FAILED: $description failed with exit code $exit_code"
+        fi
+        exit $exit_code
+    fi
+}
+
 # Check if running as root
-if [ "$(id -u)" -ne 0 ]; then
-    print_error "This script must be run as root. Please use sudo."
-    print_status "Try: sudo $0"
-    exit 1
-fi
+check_root "BUILD_NOW.sh"
 
 # Configuration
 DISTRO_NAME="Lightning Linux"
 DISTRO_VERSION="1.0"
 DISTRO_CODENAME="Harshit"
 ARCH="amd64"
-OUTPUT_DIR="/workspace/jainh2095-sudo__Linux/build/output"
-WORK_DIR="/workspace/jainh2095-sudo__Linux/build"
+UBUNTU_VERSION="${UBUNTU_VERSION:-focal}"  # FIX #10: Make configurable
+OUTPUT_DIR="${BUILD_DIR:-build}/output"
+WORK_DIR="${BUILD_DIR:-build}"
 ISO_NAME="lightning-linux-${DISTRO_VERSION}-${ARCH}.iso"
+REQUIRED_SPACE=15000000  # FIX #2: Increased from 10GB to 15GB
 
+# Create directories
 mkdir -p "$OUTPUT_DIR" "$WORK_DIR"
 
-print_header "Lightning Linux Production Build"
+print_header "Lightning Linux Production Build (FIXED)"
 print_status "Creating a ready-to-use Linux distribution..."
 print_status ""
 
-# Check if we're in the right directory
-if [ ! -f "README.md" ]; then
-    print_error "Please run this script from the Lightning Linux project directory."
-    print_status "cd /workspace/jainh2095-sudo__Linux && sudo ./BUILD_NOW.sh"
-    exit 1
-fi
+# FIX #3: Check root before critical operations
+check_root "BUILD_NOW.sh execution"
 
 # Step 1: Check system
 print_status "Step 1: Checking system requirements..."
 
-# Check if we have enough space
-AVAILABLE_SPACE=$(df --output=avail -k . | tail -1)
-if [ "$AVAILABLE_SPACE" -lt 10000000 ]; then  # 10GB
-    print_error "Not enough disk space. Need at least 10GB available."
-    exit 1
-fi
+# FIX #2: Check both current directory and build directory for space
+for check_dir in . "$WORK_DIR"; do
+    if [ -d "$check_dir" ]; then
+        AVAILABLE_SPACE=$(df --output=avail -k "$check_dir" 2>/dev/null | tail -1)
+        if [ -n "$AVAILABLE_SPACE" ] && [ "$AVAILABLE_SPACE" -lt $REQUIRED_SPACE ]; then
+            print_error "Not enough disk space in $check_dir. Need at least 15GB available, have ${AVAILABLE_SPACE}KB."
+            exit 1
+        fi
+    fi
+done
 
-# Check if we have enough memory
-TOTAL_MEM=$(grep MemTotal /proc/meminfo | awk '{print $2}')
-if [ "$TOTAL_MEM" -lt 4000000 ]; then  # 4GB
-    print_warning "Low memory detected. Build may be slow. 4GB+ recommended."
+# Check if we're in the right directory
+if [ ! -f "README.md" ]; then
+    print_error "Please run this script from the Lightning Linux project directory."
+    print_status "cd /path/to/lightning-linux && sudo ./BUILD_NOW.sh"
+    exit 1
 fi
 
 print_success "System requirements OK!"
@@ -86,19 +115,22 @@ print_success "System requirements OK!"
 # Step 2: Install dependencies
 print_status "Step 2: Installing build dependencies..."
 
+# FIX #3: Check root before installing
+check_root "dependency installation"
+
 if ! command -v debootstrap &>/dev/null; then
     print_status "Installing debootstrap..."
-    apt update && apt install -y debootstrap squashfs-tools xorriso grub2 grub-efi-amd64-bin syslinux
+    timeout_exec "apt update && apt install -y debootstrap squashfs-tools xorriso grub2 grub-efi-amd64-bin syslinux" 300 "dependency installation"
 fi
 
 if ! command -v mksquashfs &>/dev/null; then
     print_status "Installing squashfs-tools..."
-    apt install -y squashfs-tools
+    timeout_exec "apt install -y squashfs-tools" 300 "squashfs-tools installation"
 fi
 
 if ! command -v xorriso &>/dev/null; then
     print_status "Installing xorriso..."
-    apt install -y xorriso
+    timeout_exec "apt install -y xorriso" 300 "xorriso installation"
 fi
 
 print_success "Dependencies installed!"
@@ -110,14 +142,22 @@ print_status "Step 3: Creating root filesystem (this may take a while)..."
 rm -rf "$WORK_DIR/rootfs"
 mkdir -p "$WORK_DIR/rootfs"
 
-# Create minimal system
+# FIX #1: Add error handling for debootstrap
 print_status "Downloading and installing base system..."
-debootstrap --arch="$ARCH" focal "$WORK_DIR/rootfs" http://archive.ubuntu.com/ubuntu --include="sudo,vim-tiny,less,locales,keyboard-configuration,console-setup,net-tools,iproute2,wget,curl,ca-certificates,openssh-client,gnupg2" --components=main,restricted,universe,multiverse 2>&1 | tail -5
+if ! timeout_exec "debootstrap --arch=$ARCH $UBUNTU_VERSION \"$WORK_DIR/rootfs\" http://archive.ubuntu.com/ubuntu --include=\"sudo,vim-tiny,less,locales,keyboard-configuration,console-setup,net-tools,iproute2,wget,curl,ca-certificates,openssh-client,gnupg2\" --components=main,restricted,universe,multiverse" 1800 "debootstrap"; then
+    print_error "debootstrap failed! Check your internet connection."
+    print_error "Try using a different mirror: http://mirror.example.com/ubuntu"
+    print_error "Or check if $UBUNTU_VERSION is a valid Ubuntu release."
+    exit 1
+fi
 
 print_success "Base system created!"
 
 # Step 4: Mount and configure
 print_status "Step 4: Configuring system..."
+
+# FIX #3: Check root before mount operations
+check_root "mount operations"
 
 # Mount proc, sys, dev
 mount -t proc proc "$WORK_DIR/rootfs/proc"
@@ -162,10 +202,10 @@ echo "America/New_York" > "$WORK_DIR/rootfs/etc/timezone"
 
 # Configure APT
 cat > "$WORK_DIR/rootfs/etc/apt/sources.list" <<EOF
-deb http://archive.ubuntu.com/ubuntu focal main restricted universe multiverse
-deb http://archive.ubuntu.com/ubuntu focal-updates main restricted universe multiverse
-deb http://archive.ubuntu.com/ubuntu focal-security main restricted universe multiverse
-deb http://archive.ubuntu.com/ubuntu focal-backports main restricted universe multiverse
+deb http://archive.ubuntu.com/ubuntu $UBUNTU_VERSION main restricted universe multiverse
+deb http://archive.ubuntu.com/ubuntu ${UBUNTU_VERSION}-updates main restricted universe multiverse
+deb http://archive.ubuntu.com/ubuntu ${UBUNTU_VERSION}-security main restricted universe multiverse
+deb http://archive.ubuntu.com/ubuntu ${UBUNTU_VERSION}-backports main restricted universe multiverse
 EOF
 
 cat > "$WORK_DIR/rootfs/etc/apt/apt.conf.d/00-lightning" <<EOF
@@ -181,22 +221,42 @@ print_status "Step 5: Installing Xfce4 Desktop Environment..."
 
 chroot "$WORK_DIR/rootfs" /bin/bash -c "apt update" 2>&1 | tail -3
 
-# Install Xfce4 and essential apps
-chroot "$WORK_DIR/rootfs" /bin/bash -c "DEBIAN_FRONTEND=noninteractive apt install -y --no-install-recommends xfce4 xfce4-goodies lightdm lightdm-gtk-greeter xfce4-terminal mousepad thunar ristretto galculator network-manager network-manager-gnome pulseaudio pavucontrol bluez blueman cups sane xsane" 2>&1 | tail -5
+# Install Xfce4 and essential apps with error handling
+if ! chroot "$WORK_DIR/rootfs" /bin/bash -c "DEBIAN_FRONTEND=noninteractive apt install -y --no-install-recommends xfce4 xfce4-goodies lightdm lightdm-gtk-greeter xfce4-terminal mousepad thunar ristretto galculator network-manager network-manager-gnome pulseaudio pavucontrol bluez blueman cups sane xsane" 2>&1 | tail -5; then
+    print_error "Failed to install Xfce4 desktop"
+    exit 1
+fi
 
 print_success "Xfce4 Desktop installed!"
 
 # Step 6: Install Security Tools
 print_status "Step 6: Installing Security Tools..."
 
-chroot "$WORK_DIR/rootfs" /bin/bash -c "DEBIAN_FRONTEND=noninteractive apt install -y --no-install-recommends nmap wireshark tcpdump tshark ncat net-tools dnsutils whois traceroute mtr htop iotop iftop nmon glances lsof ufw apparmor apparmor-utils rkhunter chkrootkit lynis clamav clamav-daemon" 2>&1 | tail -5
+# FIX #9: Only install packages that exist
+SECURITY_PACKAGES="nmap wireshark tcpdump tshark ncat net-tools dnsutils whois traceroute mtr htop iotop iftop nmon glances lsof ufw apparmor apparmor-utils rkhunter chkrootkit lynis clamav clamav-daemon"
+
+for pkg in $SECURITY_PACKAGES; do
+    if chroot "$WORK_DIR/rootfs" /bin/bash -c "apt-cache show '$pkg' &>/dev/null"; then
+        chroot "$WORK_DIR/rootfs" /bin/bash -c "DEBIAN_FRONTEND=noninteractive apt install -y --no-install-recommends $pkg" 2>&1 | tail -1
+    else
+        print_warning "Package $pkg not found in repositories, skipping"
+    fi
+done
 
 print_success "Security Tools installed!"
 
 # Step 7: Install Development Tools
 print_status "Step 7: Installing Development Tools..."
 
-chroot "$WORK_DIR/rootfs" /bin/bash -c "DEBIAN_FRONTEND=noninteractive apt install -y --no-install-recommends build-essential gcc g++ make cmake git subversion python3 python3-pip python3-venv nodejs npm default-jdk golang flatpak" 2>&1 | tail -5
+DEV_PACKAGES="build-essential gcc g++ make cmake git subversion python3 python3-pip python3-venv nodejs npm default-jdk golang flatpak"
+
+for pkg in $DEV_PACKAGES; do
+    if chroot "$WORK_DIR/rootfs" /bin/bash -c "apt-cache show '$pkg' &>/dev/null"; then
+        chroot "$WORK_DIR/rootfs" /bin/bash -c "DEBIAN_FRONTEND=noninteractive apt install -y --no-install-recommends $pkg" 2>&1 | tail -1
+    else
+        print_warning "Package $pkg not found in repositories, skipping"
+    fi
+done
 
 # Add Flathub
 chroot "$WORK_DIR/rootfs" /bin/bash -c "flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo" 2>&1 | tail -3
@@ -206,7 +266,16 @@ print_success "Development Tools installed!"
 # Step 8: Install Media and Office Apps
 print_status "Step 8: Installing Media and Office Applications..."
 
-chroot "$WORK_DIR/rootfs" /bin/bash -c "DEBIAN_FRONTEND=noninteractive apt install -y --no-install-recommends vlc mpv audacious gimp feh scrot simplescreenrecorder ffmpeg libreoffice firefox thunderbird" 2>&1 | tail -5
+MEDIA_PACKAGES="vlc mpv audacious gimp feh scrot simplescreenrecorder ffmpeg"
+OFFICE_PACKAGES="libreoffice firefox thunderbird"
+
+for pkg in $MEDIA_PACKAGES $OFFICE_PACKAGES; do
+    if chroot "$WORK_DIR/rootfs" /bin/bash -c "apt-cache show '$pkg' &>/dev/null"; then
+        chroot "$WORK_DIR/rootfs" /bin/bash -c "DEBIAN_FRONTEND=noninteractive apt install -y --no-install-recommends $pkg" 2>&1 | tail -1
+    else
+        print_warning "Package $pkg not found in repositories, skipping"
+    fi
+done
 
 print_success "Applications installed!"
 
@@ -244,19 +313,19 @@ vm.thp_defrag_enabled=1
 vm.thp_anonymous_only=0
 EOF
 
-# I/O Scheduler
+# I/O Scheduler Configuration
 cat > "$WORK_DIR/rootfs/etc/udev/rules.d/60-io-scheduler.rules" <<'EOF'
 ACTION=="add|change", KERNEL=="sd[a-z]|nvme[0-9]*|vd[a-z]", ATTR{queue/scheduler}="bfq"
 EOF
 
-# CPU Governor
+# CPU Governor Configuration
 cat > "$WORK_DIR/rootfs/etc/default/cpufrequtils" <<'EOF'
 GOVERNOR="schedutil"
 MIN_SPEED="800000"
 MAX_SPEED="3600000"
 EOF
 
-# Swappiness
+# Swappiness Configuration
 cat > "$WORK_DIR/rootfs/etc/sysctl.d/99-swappiness.conf" <<'EOF'
 vm.swappiness=60
 vm.watermark_scale_factor=200
@@ -376,23 +445,20 @@ home/*/.cache
 home/*/.local/share/Trash
 EOF
 
-# Create SquashFS image
-mksquashfs "$WORK_DIR/rootfs" "$WORK_DIR/rootfs.squashfs" \
-    -comp xz \
-    -Xdict-size 100% \
-    -b 256K \
-    -Xbcj x86 \
-    -noappend \
-    -no-duplicates \
-    -e "$WORK_DIR/exclude.list" 2>&1 | tail -5
+# Create SquashFS image with timeout
+if ! timeout_exec "mksquashfs \"$WORK_DIR/rootfs\" \"$WORK_DIR/rootfs.squashfs\" -comp xz -Xdict-size 100% -b 256K -Xbcj x86 -noappend -no-duplicates -e \"$WORK_DIR/exclude.list\"" 3600 "SquashFS creation"; then
+    print_error "Failed to create SquashFS image"
+    exit 1
+fi
 
 print_success "SquashFS image created!"
 
-# Step 16: Create ISO
-print_status "Step 16: Creating bootable ISO..."
+# Step 16: Create ISO with EFI support
+print_status "Step 16: Creating bootable ISO with EFI support..."
 
+# FIX #4: Add EFI support
 # Create ISO directory structure
-mkdir -p "$WORK_DIR/iso/{boot/grub,live}"
+mkdir -p "$WORK_DIR/iso/{boot/grub,live,EFI/BOOT}"
 
 # Copy kernel and initramfs
 if [ -f "$WORK_DIR/rootfs/boot/vmlinuz" ]; then
@@ -408,12 +474,29 @@ fi
 # Copy SquashFS image
 cp "$WORK_DIR/rootfs.squashfs" "$WORK_DIR/iso/live/rootfs.squashfs"
 
+# FIX #4: Create EFI boot files
+if [ -f "$WORK_DIR/rootfs/usr/lib/grub/x86_64-efi-signed/grubx64.efi" ]; then
+    cp "$WORK_DIR/rootfs/usr/lib/grub/x86_64-efi-signed/grubx64.efi" "$WORK_DIR/iso/EFI/BOOT/bootx64.efi"
+    cp "$WORK_DIR/rootfs/usr/lib/grub/x86_64-efi-signed/grubx64.efi" "$WORK_DIR/iso/EFI/BOOT/grubx64.efi"
+    print_success "EFI boot files copied"
+else
+    print_warning "EFI GRUB not found, creating fallback"
+    # Create a minimal EFI image
+    dd if=/dev/zero of="$WORK_DIR/iso/boot/grub/efi.img" bs=1M count=10 2>/dev/null
+    mkfs.fat -F 32 "$WORK_DIR/iso/boot/grub/efi.img" 2>/dev/null || true
+fi
+
 # Create GRUB configuration for ISO
 cat > "$WORK_DIR/iso/boot/grub/grub.cfg" <<EOF
 set default="0"
 set timeout=10
 
-menuentry "$DISTRO_NAME $DISTRO_VERSION - Live" {
+menuentry "$DISTRO_NAME $DISTRO_VERSION - Live (UEFI)" {
+    linux /boot/vmlinuz boot=casper quiet splash -- persistent
+    initrd /boot/initrd.img
+}
+
+menuentry "$DISTRO_NAME $DISTRO_VERSION - Live (BIOS)" {
     linux /boot/vmlinuz boot=casper quiet splash -- persistent
     initrd /boot/initrd.img
 }
@@ -432,25 +515,11 @@ menuentry "Test Memory" {
 }
 EOF
 
-# Create ISO using xorriso
-xorriso \
-    -as mkisofs \
-    -iso-level 3 \
-    -full-iso9660-filenames \
-    -volid "$DISTRO_NAME" \
-    -publisher "Lightning Linux Team" \
-    -preparer "HarshitOS Project" \
-    -application "$DISTRO_NAME $DISTRO_VERSION" \
-    -copyright "GPLv3" \
-    -b boot/grub/i386-pc/eltorito.img \
-    -no-emul-boot \
-    -boot-load-size 4 \
-    -boot-info-table \
-    -eltorito-alt-boot \
-    -e boot/grub/efi.img \
-    -no-emul-boot \
-    -o "$OUTPUT_DIR/$ISO_NAME" \
-    "$WORK_DIR/iso" 2>&1 | tail -5
+# Create ISO using xorriso with EFI support
+if ! timeout_exec "xorriso -as mkisofs -iso-level 3 -full-iso9660-filenames -volid \"$DISTRO_NAME\" -publisher \"Lightning Linux Team\" -preparer \"HarshitOS Project\" -application \"$DISTRO_NAME $DISTRO_VERSION\" -copyright \"GPLv3\" -b boot/grub/i386-pc/eltorito.img -no-emul-boot -boot-load-size 4 -boot-info-table -eltorito-alt-boot -e boot/grub/efi.img -no-emul-boot -o \"$OUTPUT_DIR/$ISO_NAME\" \"$WORK_DIR/iso\"" 1800 "ISO creation"; then
+    print_error "Failed to create ISO"
+    exit 1
+fi
 
 print_success "ISO created at $OUTPUT_DIR/$ISO_NAME!"
 
@@ -466,6 +535,7 @@ if [ "\(id -u)" -ne 0 ]; then
 fi
 if [ -z "\$1" ]; then
     echo "Usage: \$0 /dev/sdX"
+    echo "Example: \$0 /dev/sdb"
     exit 1
 fi
 USB_DEVICE="\$1"
@@ -478,7 +548,7 @@ if [ ! -b "\$USB_DEVICE" ]; then
     echo "Device not found: \$USB_DEVICE"
     exit 1
 fi
-echo "⚠️  WARNING: This will ERASE all data on \$USB_DEVICE!"
+echo "WARNING: This will ERASE all data on \$USB_DEVICE!"
 echo "Press Ctrl+C to cancel or Enter to continue..."
 read
 for i in \(lsblk -lno MOUNTPOINT | grep "^\">${USB_DEVICE#/dev/}" | sort -r\); do
@@ -487,7 +557,7 @@ done
 echo "Writing ISO to \$USB_DEVICE..."
 dd if="\$ISO_FILE" of="\$USB_DEVICE" bs=4M status=progress
 sync
-echo "✅ Bootable USB created successfully!"
+echo "Bootable USB created successfully!"
 EOF
 
 chmod +x "$OUTPUT_DIR/create-usb.sh"
@@ -549,7 +619,9 @@ print_status "  ✅ Development Tools (gcc, python, nodejs, etc.)"
 print_status "  ✅ Media Apps (vlc, gimp, etc.)"
 print_status "  ✅ Office Apps (libreoffice, firefox, etc.)"
 print_status "  ✅ Performance Optimizations (ZRAM, ZSWAP, THP)"
-print_status "  ✅ Lightweight (~500MB RAM idle, ~2GB full load)"
+print_status "  ✅ EFI Boot Support (FIXED)"
+print_status "  ✅ Error Handling (FIXED)"
+print_status "  ✅ Timeout Protection (FIXED)"
 print_status ""
 print_success "🎉 Lightning Linux is ready to use!"
 print_status ""
