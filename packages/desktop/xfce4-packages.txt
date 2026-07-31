@@ -1,0 +1,407 @@
+# Lightning Linux - Xfce4 Desktop Environment Packages
+# Part of HarshitOS / Lightning Linux project
+# https://github.com/jainh2095-sudo/Linux
+
+# ==========================================
+# XFCE4 CORE PACKAGES
+# ==========================================
+
+# Xfce4 base packages
+xfce4
+xfce4-goodies
+
+# Xfce4 components
+xfce4-session
+xfce4-settings
+xfce4-panel
+xfce4-desktop
+xfce4-utils
+xfce4-terminal
+xfce4-taskmanager
+xfce4-clipman-plugin
+xfce4-notes-plugin
+xfce4-screenshooter
+xfce4-sensors-plugin
+xfce4-systemload-plugin
+xfce4-netload-plugin
+xfce4-cpufreq-plugin
+xfce4-cpugraph-plugin
+xfce4-datetime-plugin
+xfce4-diskperf-plugin
+xfce4-fsguard-plugin
+xfce4-genmon-plugin
+xfce4-mailwatch-plugin
+xfce4-mount-plugin
+xfce4-mpc-plugin
+xfce4-orage
+xfce4-places-plugin
+xfce4-pulseaudio-plugin
+xfce4-quicklaunch-plugin
+xfce4-smartbookmark-plugin
+xfce4-timer-plugin
+xfce4-verve-plugin
+xfce4-wavelan-plugin
+xfce4-weather-plugin
+xfce4-whiskermenu-plugin
+xfce4-xkb-plugin
+
+# ==========================================
+# XFCE4 APPS
+# ==========================================
+
+# File manager
+thunar
+thunar-archive-plugin
+thunar-media-tags-plugin
+thunar-volman
+
+# Text editor
+mousepad
+
+# Image viewer
+ristretto
+
+# Screenshot tool
+xfce4-screenshooter
+
+# Calculator
+galculator
+
+# Dictionary
+xfce4-dict
+
+# ==========================================
+# WINDOW MANAGER
+# ==========================================
+
+# Xfwm4 (Xfce window manager)
+xfwm4
+xfwm4-themes
+
+# Compositing
+picom
+
+# ==========================================
+# DISPLAY MANAGER
+# ==========================================
+
+# LightDM
+lightdm
+lightdm-gtk-greeter
+lightdm-gtk-greeter-settings
+
+# LightDM themes and settings
+light-themes
+lightdm-settings
+
+# ==========================================
+# GTK THEMES AND ICONS
+# ==========================================
+
+# GTK themes
+gtk2-engines-murrine
+gtk2-engines-pixbuf
+adwaita-icon-theme
+adwaita-icon-theme-full
+hicolor-icon-theme
+
+# Xfce themes
+xfce4-artwork
+
+# Icon themes
+papirus-icon-theme
+elementary-icon-theme
+
+# Cursor themes
+bibata-cursor-theme
+dmz-cursor-theme
+
+# ==========================================
+# FONTS
+# ==========================================
+
+# Fonts
+fonts-dejavu
+fonts-dejavu-core
+fonts-dejavu-extra
+fonts-liberation
+fonts-liberation2
+fonts-noto
+fonts-noto-core
+fonts-noto-extra
+fonts-noto-color-emoji
+fonts-ubuntu
+fonts-roboto
+
+# ==========================================
+# X11 AND GRAPHICS
+# ==========================================
+
+# Xorg
+xorg
+xserver-xorg-core
+xserver-xorg-input-all
+xserver-xorg-video-all
+
+# Xorg drivers
+xserver-xorg-video-intel
+xserver-xorg-video-ati
+xserver-xorg-video-amdgpu
+xserver-xorg-video-nouveau
+xserver-xorg-video-vmware
+xserver-xorg-video-qxl
+xserver-xorg-video-fbdev
+
+# Xorg utilities
+x11-xserver-utils
+x11-apps
+x11-session-utils
+x11-utils
+x11-xkb-utils
+xauth
+xfonts-base
+xfonts-100dpi
+xfonts-75dpi
+xfonts-scalable
+
+# Graphics libraries
+libgl1-mesa-glx
+libgl1-mesa-dri
+libglapi-mesa
+libxcb-glx0
+libxcb-render0
+libxcb-shape0
+libxcb-xfixes0
+libxcb-xinerama0
+libxcb-dri2-0
+libxcb-dri3-0
+
+# Vulkan
+vulkan-tools
+mesa-vulkan-drivers
+
+# ==========================================
+# INPUT DEVICES
+# ==========================================
+
+# Input drivers
+xserver-xorg-input-all
+xinput
+
+# Touchpad support
+xserver-xorg-input-synaptics
+xserver-xorg-input-libinput
+
+# ==========================================
+# SOUND AND MULTIMEDIA
+# ==========================================
+
+# PulseAudio
+pulseaudio
+pulseaudio-utils
+pulseaudio-module-bluetooth
+pavucontrol
+
+# ALSA
+alsa-base
+alsa-utils
+alsamixer
+
+# ==========================================
+# NETWORK MANAGEMENT
+# ==========================================
+
+# Network Manager
+network-manager
+network-manager-gnome
+network-manager-pptp
+network-manager-pptp-gnome
+network-manager-openvpn
+network-manager-openvpn-gnome
+network-manager-strongswan
+network-manager-strongswan-gnome
+
+# Network utilities
+nm-applet
+nm-tray
+
+# ==========================================
+# BLUETOOTH
+# ==========================================
+
+# Bluetooth support
+bluez
+bluez-tools
+blueman
+pulseaudio-module-bluetooth
+
+# ==========================================
+# POWER MANAGEMENT
+# ==========================================
+
+# Power management
+xfce4-power-manager
+xfce4-power-manager-plugins
+
+# TLP (Advanced power management)
+tlp
+tlp-rdw
+
+# ==========================================
+# PRINTING
+# ==========================================
+
+# Printing support
+cups
+cups-bsd
+cups-client
+cups-common
+cups-core-drivers
+cups-daemon
+cups-filters
+cups-ipp-utils
+cups-pk-helper
+cups-ppdc
+cups-server-common
+
+# Printer drivers
+hplip
+printer-driver-all
+
+# ==========================================
+# SCANNING
+# ==========================================
+
+# Scanning support
+sane
+sane-utils
+xsane
+simple-scan
+
+# ==========================================
+# ACCESSIBILITY
+# ==========================================
+
+# Accessibility tools
+orca
+mousetweaks
+xfce4-accessibility-plugin
+
+# ==========================================
+# SCREEN LOCKING
+# ==========================================
+
+# Screen locker
+light-locker
+light-locker-settings
+xscreensaver
+
+# ==========================================
+# NOTIFICATIONS
+# ==========================================
+
+# Notification daemon
+xfce4-notifyd
+libnotify-bin
+
+# ==========================================
+# SYSTEM TRAY
+# ==========================================
+
+# System tray
+xfce4-indicator-plugin
+xfce4-statusnotifier-plugin
+
+# ==========================================
+# APPLETS AND PLUGINS
+# ==========================================
+
+# Panel plugins
+xfce4-appfinder
+xfce4-battery-plugin
+xfce4-clipman-plugin
+xfce4-cpugraph-plugin
+xfce4-datetime-plugin
+xfce4-diskperf-plugin
+xfce4-fsguard-plugin
+xfce4-genmon-plugin
+xfce4-mailwatch-plugin
+xfce4-mount-plugin
+xfce4-mpc-plugin
+xfce4-netload-plugin
+xfce4-notes-plugin
+xfce4-places-plugin
+xfce4-pulseaudio-plugin
+xfce4-quicklaunch-plugin
+xfce4-sensors-plugin
+xfce4-smartbookmark-plugin
+xfce4-systemload-plugin
+xfce4-taskmanager
+xfce4-timer-plugin
+xfce4-verve-plugin
+xfce4-wavelan-plugin
+xfce4-weather-plugin
+xfce4-whiskermenu-plugin
+xfce4-xkb-plugin
+
+# ==========================================
+# THEMES AND CUSTOMIZATION
+# ==========================================
+
+# Theme engines
+gtk2-engines-murrine
+gtk2-engines-pixbuf
+
+# Theme packages
+adwaita-icon-theme
+adwaita-icon-theme-full
+hicolor-icon-theme
+
+# Xfce themes
+xfce4-artwork
+
+# Additional themes
+matcha-gtk-theme
+papirus-icon-theme
+bibata-cursor-theme
+
+# ==========================================
+# UTILITIES
+# ==========================================
+
+# Archive management
+file-roller
+engramps
+
+# Calculator
+galculator
+
+# Dictionary
+xfce4-dict
+
+# Text editor
+mousepad
+geany
+
+# File manager
+thunar
+thunar-archive-plugin
+thunar-media-tags-plugin
+thunar-volman
+
+# Image viewer
+ristretto
+
+# Screenshot
+xfce4-screenshooter
+
+# Clipboard manager
+xfce4-clipman-plugin
+
+# ==========================================
+# TOTAL ESTIMATES
+# ==========================================
+
+# Total: ~250 packages
+# Estimated size: ~300-400MB
+# RAM usage: ~150-200MB (with apps)

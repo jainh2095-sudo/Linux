@@ -1,0 +1,223 @@
+# Lightning Linux - Base System Packages
+# Part of HarshitOS / Lightning Linux project
+# https://github.com/jainh2095-sudo/Linux
+
+# ==========================================
+# CORE SYSTEM PACKAGES
+# ==========================================
+
+# Essential system packages
+bash
+coreutils
+util-linux
+findutils
+grep
+sed
+awk
+gzip
+bzip2
+xz-utils
+tar
+curl
+wget
+ca-certificates
+openssl
+
+# System utilities
+file
+mime-support
+less
+nano
+vim-tiny
+man-db
+info
+
+# Process management
+procps
+psmisc
+sysvinit-utils
+initscripts
+
+# Hardware detection and management
+pciutils
+usbutils
+lsb-release
+os-prober
+dmidecode
+lshw
+inxi
+hwinfo
+
+# Filesystem tools
+e2fsprogs
+xfsprogs
+btrfs-progs
+ntfs-3g
+dosfstools
+hdparm
+smartmontools
+
+# Device management
+udev
+e2fsck
+dumpe2fs
+fsck
+parted
+gparted
+fdisk
+cfdisk
+sfdisk
+
+# ==========================================
+# KERNEL AND BOOT PACKAGES
+# ==========================================
+
+# Kernel packages
+linux-image-generic
+linux-headers-generic
+linux-firmware
+
+# Bootloader
+grub2
+grub-efi
+grub-efi-amd64
+grub-efi-ia32
+syslinux
+syslinux-common
+isolinux
+
+# Initramfs tools
+initramfs-tools
+busybox
+klibc-utils
+
+# ==========================================
+# NETWORK PACKAGES
+# ==========================================
+
+# Network utilities
+net-tools
+iproute2
+iputils-ping
+iputils-tracepath
+
+# DNS tools
+dnsutils
+bind9-host
+
+# Network management
+ifupdown
+network-manager
+
+# Wireless tools
+wireless-tools
+wpasupplicant
+crda
+
+# ==========================================
+# USER AND GROUP MANAGEMENT
+# ==========================================
+
+# User management
+passwd
+shadow
+adduser
+login
+sudo
+
+# Group management
+base-passwd
+
+# ==========================================
+# TIME AND DATE
+# ==========================================
+
+# Time management
+tzdata
+ntp
+ntpdate
+
+# ==========================================
+# LOCALE AND INTERNATIONALIZATION
+# ==========================================
+
+# Locale support
+locales
+console-setup
+keyboard-configuration
+
+# Fonts
+fonts-ubuntu-console
+
+# ==========================================
+# SECURITY PACKAGES
+# ==========================================
+
+# Authentication
+pam
+libpam-modules
+libpam-runtime
+
+# Security tools
+apparmor
+apparmor-utils
+
+# ==========================================
+# LOGGING AND MONITORING
+# ==========================================
+
+# Logging
+rsyslog
+logrotate
+
+# System monitoring
+sysstat
+
+# ==========================================
+# TERMINAL AND SHELL
+# ==========================================
+
+# Shell
+bash
+bash-completion
+
+# Terminal
+xterm
+
+# ==========================================
+# COMPRESSION TOOLS
+# ==========================================
+
+# Compression utilities
+unzip
+zip
+p7zip-full
+rar
+unrar
+lzma
+
+# ==========================================
+# BUILD ESSENTIALS
+# ==========================================
+
+# Build tools
+build-essential
+gcc
+g++
+make
+binutils
+
+# Library development
+libc6-dev
+libstdc++6
+
+# ==========================================
+# DOCUMENTATION
+# ==========================================
+
+# Documentation tools
+groff
+base-files
+
+# Total: ~200 packages
+# Estimated size: ~200-300MB

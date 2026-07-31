@@ -1,0 +1,236 @@
+# Lightning Linux - Security Tools Packages
+# Part of HarshitOS / Lightning Linux project
+# https://github.com/jainh2095-sudo/Linux
+
+# ==========================================
+# NETWORK SECURITY TOOLS
+# ==========================================
+
+# Network scanning and discovery
+nmap
+zenmap
+masscan
+
+# Network protocol analysis
+wireshark
+wireshark-qt
+wireshark-common
+tshark
+tcpdump
+
+# Network monitoring
+iftop
+iptraf-ng
+nethogs
+bmon
+nload
+
+# Port scanning and testing
+ncat
+nc
+socat
+netcat-openbsd
+
+# DNS tools
+dnsutils
+dig
+nslookup
+whois
+
+# Network utilities
+net-tools
+iproute2
+iputils-ping
+iputils-tracepath
+traceroute
+mtr
+
+# ==========================================
+# PENETRATION TESTING TOOLS
+# ==========================================
+
+# Metasploit Framework
+metasploit-framework
+
+# Web application security
+sqlmap
+nikto
+wpscan
+skipfish
+
+# Password cracking
+john
+john-data
+hashcat
+hydra
+medusa
+
+# Wireless security
+aircrack-ng
+reaver
+wifite
+
+# Bluetooth security
+blueranger
+
+# RFID/NFC tools
+libnfc-bin
+mfoc
+mfcuk
+
+# ==========================================
+# VULNERABILITY SCANNING
+# ==========================================
+
+# Vulnerability scanners
+openvas
+openvas-cli
+gvm
+
+# Web vulnerability scanners
+burpsuite
+zaproxy
+
+# Container security
+dockle
+trivy
+
+# ==========================================
+# FORENSICS TOOLS
+# ==========================================
+
+# Disk forensics
+testdisk
+photorec
+foremost
+scalpel
+
+# Memory forensics
+volatility
+
+# File analysis
+binwalk
+exiftool
+file
+strings
+
+# Timeline analysis
+plaso
+log2timeline
+
+# ==========================================
+# MONITORING AND ANALYSIS
+# ==========================================
+
+# System monitoring
+lynis
+rkhunter
+chkrootkit
+
+# Rootkit detection
+rootkit-hunter
+
+# Antivirus
+clamscan
+clamav
+clamav-daemon
+clamav-freshclam
+
+# Intrusion detection
+snort
+suricata
+oinkmaster
+
+# Log analysis
+logwatch
+logcheck
+swatch
+
+# ==========================================
+# ENCRYPTION AND PRIVACY
+# ==========================================
+
+# Encryption tools
+gnupg
+gnupg2
+openssl
+libssl-dev
+
+# Disk encryption
+cryptsetup
+luks-tools
+
+# File encryption
+encfs
+ccrypt
+gocryptfs
+
+# Password management
+keepassx
+keepassxc
+pass
+
+# VPN tools
+openvpn
+wireguard
+strongswan
+
+# Tor and anonymity
+tor
+torsocks
+privoxy
+
+# ==========================================
+# FIREWALL AND NETWORK SECURITY
+# ==========================================
+
+# Firewall
+ufw
+nftables
+iptables
+
+# Network filtering
+tcpdstat
+tcptrack
+
+# ==========================================
+# SECURITY AUDITING
+# ==========================================
+
+# Security auditing
+tiger
+bastille
+
+# Configuration management
+puppet
+chef
+ansible
+
+# ==========================================
+# MALWARE ANALYSIS
+# ==========================================
+
+# Sandboxing
+firejail
+bubblewrap
+
+# Malware analysis
+yara
+pev
+
+# ==========================================
+# CRYPTOCURRENCY TOOLS
+# ==========================================
+
+# Bitcoin tools
+bitcoin
+bitcoind
+
+# Ethereum tools
+geth
+
+# Wallet tools
+electrum
+
+# Total: ~150 packages
+# Estimated size: ~500-800MB
